@@ -3,20 +3,23 @@ import React, { useState } from "react";
 import { ImArrowUp2, ImArrowUp } from "react-icons/im";
 
 import { Post as PostType } from "../types/post";
+import { ethers } from "ethers";
 
-type PostProps = {
-  post: PostType;
-};
-
-const Post = ({ post }: PostProps): React.ReactNode => {
+const Post = ({ post, contract }: { post: PostType, contract: ethers.Contract | null }): React.ReactNode => {
     const [upvoted, setUpvoted] = useState<boolean>(post.alreadyUpvoted);
 
-    const handleOnClick = () => {
+    const handleOnClick = async () => {
         if (upvoted) {
             alert('You have already upvoted this post! You can not take it back :(');
         }
 
-        setUpvoted(true);
+        try {
+            await contract?.upvote(post.id);
+            setUpvoted(true);
+        } catch (e) {
+            alert('Failed to upvote post! Metamask might not be connected to the *arbitrum* sepolia network!');
+            console.log(e);
+        }
     };
 
     return (
