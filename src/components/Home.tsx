@@ -1,18 +1,20 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { ethers } from "ethers";
 
 import Post from '../components/Post';
 import { type Post as PostType } from "../types/post";
-import { AddressContext } from "../App";
 
-const Home = ({ contract }: { contract: ethers.Contract }): React.ReactNode => {
+const Home = ({ contract }: { contract: ethers.Contract | null }): React.ReactNode => {
     const [failed, setFailed] = useState(false);
     const [loading, setLoading] = useState(true);
     const [posts, setPosts] = useState<PostType[]>([]);
-    const { address } = useContext(AddressContext);
 
     useEffect(() => {
         const cb = async () => {
+            if (!contract) {
+                return;
+            }
+
             const posts: PostType[] = [];
 
             try {
@@ -25,6 +27,7 @@ const Home = ({ contract }: { contract: ethers.Contract }): React.ReactNode => {
                         content: d[2],
                         upvotes: Number(d[3]),
                         timestamp: new Date(Number(d[4]) * 1000),
+                        alreadyUpvoted: await contract.alreadyUpvoted(Number(d[0])),
                     }
 
                     posts.push(post);
@@ -39,16 +42,21 @@ const Home = ({ contract }: { contract: ethers.Contract }): React.ReactNode => {
         }
 
         cb();
-    }, [address]);
+    }, [contract]);
 
     if (failed) {
         return <div className="mt-20">
-            <p>Failed to load posts! Make sure you have metamask installed.</p>
+            <p>Failed to load posts! Make sure you have metamask installed and connected to the *arbitrum* sepolia network.</p>
+        </div>
+    }
+
+    if (loading) {
+        return  <div className="mt-20">
+            <p>Loading posts... Make sure you have metamask installed and connected to the *arbitrum* sepolia network!</p>
         </div>
     }
 
     return <div className="mt-20 flex p-4">
-        {loading && <p>Loading...</p>}
         {
             posts.length && posts.map((post: PostType) => {
                 return <Post key={post.id} post={post} />

@@ -2,12 +2,13 @@ import React from "react";
 
 import { ethers } from 'ethers';
 
-import { AddressContext } from "../App";
+import { AddressContext } from '../context/globalContext';
 
 declare const window: any;
 
 const ConnectMetamask = (): React.ReactNode => {
     const { updateAddress } = React.useContext(AddressContext);
+    const provider = new ethers.BrowserProvider(window.ethereum);
 
     const handleOnClick = async () => {
         if (!window.ethereum) {
@@ -15,7 +16,6 @@ const ConnectMetamask = (): React.ReactNode => {
             return;
         }
 
-        const provider = new ethers.BrowserProvider(window.ethereum);
         const signer = await provider.getSigner();
         const address = await signer.getAddress();
 

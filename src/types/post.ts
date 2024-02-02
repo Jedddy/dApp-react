@@ -4,4 +4,5 @@ export type Post = {
     content: string;
     upvotes: number;
     timestamp: Date;
+    alreadyUpvoted: boolean;
 };
