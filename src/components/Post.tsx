@@ -11,6 +11,7 @@ const Post = ({ post, contract }: { post: PostType, contract: ethers.Contract | 
     const handleOnClick = async () => {
         if (upvoted) {
             alert('You have already upvoted this post! You can not take it back :(');
+            return;
         }
 
         try {
