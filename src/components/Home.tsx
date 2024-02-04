@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { ethers } from "ethers";
 
-import Post from '../components/Post';
+import Post from "../components/Post";
+import Info from "./Info";
 import { type Post as PostType } from "../types/post";
 
 const Home = ({ contract }: { contract: ethers.Contract | null }): React.ReactNode => {
@@ -44,7 +45,9 @@ const Home = ({ contract }: { contract: ethers.Contract | null }): React.ReactNo
 
     useEffect(() => { cb(); }, [contract]);
 
-    const handleSubmit = async () => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
         if (!content) {
             alert('Post content can not be empty!');
             return;
@@ -69,22 +72,18 @@ const Home = ({ contract }: { contract: ethers.Contract | null }): React.ReactNo
     }
 
     if (failed) {
-        return <div className="mt-20">
-            <p>Failed to load posts! Make sure you have metamask installed and connected to the *arbitrum* sepolia network.</p>
-        </div>
+        return <Info text="Failed to load posts! Make sure you have metamask installed and connected to the *arbitrum* sepolia network." />
     }
 
     if (loading) {
-        return  <div className="mt-20">
-            <p>Loading posts... Make sure your metamask is connected to the *arbitrum* sepolia network!</p>
-        </div>
+        return  <Info text="Loading posts... Make sure your metamask is connected to the *arbitrum* sepolia network!" />
     }
 
     return <div className="mt-20 p-4">
-        <div className="flex w-72 justify-between mb-20">
-            <input className="ml-2 h-16 m-0" type="text" onChange={handleChange} placeholder="Post content..."/>
-            <button className="bg-cyan-200 p-2 w-16 rounded disabled:opacity-75" onClick={handleSubmit} disabled={buttonDisabled}>Post</button>
-        </div>
+        <form className="flex w-72 justify-between mb-20" onSubmit={handleSubmit}>
+            <input className="ml-2 h-16 m-0 p-4 rounded bg-cyan-100" type="text" onChange={handleChange} placeholder="Post content..."/>
+            <button className="bg-cyan-200 p-2 w-16 rounded disabled:opacity-75 hover:bg-cyan-400" type="submit" disabled={buttonDisabled}>Post</button>
+        </form>
         <h1 className="text-2xl ml-2">Posts</h1>
         <div className="flex flex-wrap gap-x-32">
             {
