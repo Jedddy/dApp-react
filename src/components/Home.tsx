@@ -34,6 +34,8 @@ const Home = ({ contract }: { contract: ethers.Contract | null }): React.ReactNo
 
                 posts.push(post);
             }
+
+            posts.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
         } catch (err) {
             setFailed(true);
             console.log(err);
