@@ -9,41 +9,40 @@ const Home = ({ contract }: { contract: ethers.Contract | null }): React.ReactNo
     const [loading, setLoading] = useState(true);
     const [posts, setPosts] = useState<PostType[]>([]);
     const [content, setContent] = useState('');
+    const [buttonDisabled, setButtonDisabled] = useState(false);
 
-    useEffect(() => {
-        const cb = async () => {
-            if (!contract) {
-                return;
-            }
-
-            const posts: PostType[] = [];
-
-            try {
-                const data: any[] = Array.from(await contract.getPosts())                    
-
-                for (let d of data) {
-                    const post = {
-                        id: Number(d[0]),
-                        author: d[1],
-                        content: d[2],
-                        upvotes: Number(d[3]),
-                        timestamp: new Date(Number(d[4]) * 1000),
-                        alreadyUpvoted: await contract.alreadyUpvoted(Number(d[0])),
-                    }
-
-                    posts.push(post);
-                }
-            } catch (err) {
-                setFailed(true);
-                console.log(err);
-            }
-
-            setLoading(false);
-            setPosts(posts);
+    const cb = async () => {
+        if (!contract) {
+            return;
         }
 
-        cb();
-    }, [contract]);
+        const posts: PostType[] = [];
+
+        try {
+            const data: any[] = Array.from(await contract.getPosts())                    
+
+            for (let d of data) {
+                const post = {
+                    id: Number(d[0]),
+                    author: d[1],
+                    content: d[2],
+                    upvotes: Number(d[3]),
+                    timestamp: new Date(Number(d[4]) * 1000),
+                    alreadyUpvoted: await contract.alreadyUpvoted(Number(d[0])),
+                }
+
+                posts.push(post);
+            }
+        } catch (err) {
+            setFailed(true);
+            console.log(err);
+        }
+
+        setLoading(false);
+        setPosts(posts);
+    }
+
+    useEffect(() => { cb(); }, [contract]);
 
     const handleSubmit = async () => {
         if (!content) {
@@ -51,13 +50,18 @@ const Home = ({ contract }: { contract: ethers.Contract | null }): React.ReactNo
             return;
         }
 
+        setButtonDisabled(true);
+
         try {
-            await contract?.createPost(content);
-            window.location.reload();
+            const post = await contract?.createPost(content);
+            await post.wait();
+            await cb();
         } catch (e) {
             alert('Failed to post! Metamask might not be connected to the *arbitrum* sepolia network!');
             console.log(e);
         }
+
+        setButtonDisabled(false);
     }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -79,10 +83,10 @@ const Home = ({ contract }: { contract: ethers.Contract | null }): React.ReactNo
     return <div className="mt-20 p-4">
         <div className="flex w-72 justify-between mb-20">
             <input className="ml-2 h-16 m-0" type="text" onChange={handleChange} placeholder="Post content..."/>
-            <button className="bg-cyan-200 p-2 w-16 rounded" onClick={handleSubmit}>Post</button>
+            <button className="bg-cyan-200 p-2 w-16 rounded disabled:opacity-75" onClick={handleSubmit} disabled={buttonDisabled}>Post</button>
         </div>
         <h1 className="text-2xl ml-2">Posts</h1>
-        <div className="flex">
+        <div className="flex flex-wrap gap-x-32">
             {
                 posts.length && posts.map((post: PostType) => {
                     return <Post key={post.id} contract={contract} post={post} />

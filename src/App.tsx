@@ -30,9 +30,7 @@ function App() {
                 );
                 setDone(true);
             })
-    }
 
-    if (window.ethereum) {
         window.ethereum.on('accountsChanged', (accounts: string[]) => {
             setAddress(accounts[0]);
             window.location.reload();
