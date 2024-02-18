@@ -20,6 +20,11 @@ function App() {
         provider
             .getSigner()
             .then((signer: ethers.Signer) => {
+                signer.getAddress().then((address: string) => {
+                        setAddress(address);
+                    }
+                );
+
                 setContract(
                     new ethers.Contract(
                         contractAddress,
