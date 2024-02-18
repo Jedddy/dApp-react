@@ -12,7 +12,7 @@ const NavBar = ({ contract }: { contract: ethers.Contract | null }): React.React
     const { address, updateAddress } = React.useContext(AddressContext);
 
     useEffect(() => {
-        if (address || window.ethereum.selectedAddress) {
+        if (address || (window.ethereum && window.ethereum.selectedAddress)) {
             setLoggedIn(true);
             updateAddress!(window.ethereum.selectedAddress);
         }
