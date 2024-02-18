@@ -16,6 +16,7 @@ const Post = ({ post, contract }: { post: PostType, contract: ethers.Contract | 
 
         try {
             await contract?.upvote(post.id);
+            post.upvotes += 1;
             setUpvoted(true);
         } catch (e) {
             alert('Failed to upvote post! Metamask might not be connected to the *arbitrum* sepolia network!');
@@ -27,8 +28,9 @@ const Post = ({ post, contract }: { post: PostType, contract: ethers.Contract | 
         <div className="bg-gray-200 w-96 rounded m-2 h-auto p-2">
         <p className="text-xs">{post.author}</p>
         <p className="mt-6 mb-6">{post.content}</p>
-        <button className="hover:bg-gray-500 p-2 rounded" onClick={handleOnClick}>
-            {(post.alreadyUpvoted || upvoted) && <ImArrowUp /> || <ImArrowUp2 />}
+        <button className="hover:bg-gray-500 p-2 rounded flex items-center gap-2" onClick={handleOnClick}>
+            {((post.alreadyUpvoted || upvoted) && <ImArrowUp /> || <ImArrowUp2 />)}
+            {post.upvotes}
         </button>
         </div>
   ) 
