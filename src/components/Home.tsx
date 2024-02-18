@@ -41,8 +41,10 @@ const Home = ({ contract }: { contract: ethers.Contract | null }): React.ReactNo
             console.log(err);
         }
 
-        setLoading(false);
-        setPosts(posts);
+        if (loading && !failed) {
+            setLoading(false);
+            setPosts(posts);
+        }
     }
 
     useEffect(() => { cb(); }, [contract]);

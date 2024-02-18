@@ -11,13 +11,12 @@ import { contractAddress, contractABI } from "./constants/contract";
 declare const window: any;
 
 function App() {
-    const [done, setDone] = React.useState<boolean>(false);
     const [address, setAddress] = React.useState<string>('');
     const [contract, setContract] = React.useState<ethers.Contract | null>(null);
 
     let provider = new ethers.BrowserProvider(window.ethereum, {chainId: 421614, name: 'arbsep'});
 
-    if (!address && !done && window.ethereum && window.ethereum.selectedAddress) {
+    if (window.ethereum && window.ethereum.selectedAddress) {
         provider
             .getSigner()
             .then((signer: ethers.Signer) => {
@@ -28,7 +27,6 @@ function App() {
                         signer, // Pass the signer object to the contract instantiation
                     )
                 );
-                setDone(true);
             })
 
         window.ethereum.on('accountsChanged', (accounts: string[]) => {
