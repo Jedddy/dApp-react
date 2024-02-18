@@ -73,27 +73,23 @@ const Home = ({ contract }: { contract: ethers.Contract | null }): React.ReactNo
         setContent(e.target.value);
     }
 
-    if (failed) {
-        return <Info text="Failed to load posts! Make sure you have metamask installed and connected to the *arbitrum* sepolia network." />
-    }
-
-    if (loading) {
-        return  <Info text="Loading posts... Make sure your metamask is connected to the *arbitrum* sepolia network!" />
-    }
-
+    
     return <div className="mt-20 p-4">
         <form className="flex w-72 justify-between mb-20" onSubmit={handleSubmit}>
             <input className="ml-2 h-16 m-0 p-4 rounded bg-cyan-100" type="text" onChange={handleChange} placeholder="Post content..."/>
             <button className="bg-cyan-200 p-2 w-16 rounded disabled:opacity-75 hover:bg-cyan-400" type="submit" disabled={buttonDisabled}>Post</button>
         </form>
-        <h1 className="text-2xl ml-2">Posts</h1>
-        <div className="flex flex-wrap gap-x-32">
-            {
-                posts.length && posts.map((post: PostType) => {
-                    return <Post key={post.id} contract={contract} post={post} />
-                }) || <p>No posts yet!</p>
-            }
-        </div>
+        {
+            failed && <Info text="Failed to load posts! Make sure you have metamask installed and connected to the *arbitrum* sepolia network." /> ||
+            loading && <Info text="Loading posts... Make sure your metamask is connected to the *arbitrum* sepolia network!" /> ||
+            <>
+                <h1 className="text-2xl ml-2">Posts</h1><div className="flex flex-wrap gap-x-32">
+                    {posts.length && posts.map((post: PostType) => {
+                        return <Post key={post.id} contract={contract} post={post} />;
+                    }) || <p>No posts yet!</p>}
+                </div>
+            </>
+        }
     </div>
 };
 
