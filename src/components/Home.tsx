@@ -22,7 +22,7 @@ const Home = ({ contract }: { contract: ethers.Contract | null }): React.ReactNo
         try {
             const data: any[] = Array.from(await contract.getPosts())                    
 
-            for (let d of data) {
+            const postPromises = data.map(async (d) => {
                 const post = {
                     id: Number(d[0]),
                     author: d[1],
@@ -31,9 +31,11 @@ const Home = ({ contract }: { contract: ethers.Contract | null }): React.ReactNo
                     timestamp: new Date(Number(d[4]) * 1000),
                     alreadyUpvoted: await contract.alreadyUpvoted(Number(d[0])),
                 }
-
+    
                 posts.push(post);
-            }
+            });
+    
+            await Promise.all(postPromises);    
 
             posts.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
         } catch (err) {
